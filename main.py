@@ -58,19 +58,20 @@ def main():
     if model_type == 'logistic_regression':
         X_train, X_test = scale_features(X_train, X_test)
 
+    # Set up the output directory
+    output_dir = f'results/{model_type}/{spot}'
+    os.makedirs(output_dir, exist_ok=True)
+
     # Train and evaluate model
     model = train_model(model, X_train, y_train)
-    evaluate_model(model, X_test, y_test)
+    evaluate_model(model, X_test, y_test, output_dir)
 
     # Plot feature importance if available
     if hasattr(model, 'feature_importances_'):
-        plot_feature_importance(model, features, f'results/{model_type}/feature_importance_{spot}.png')
-
-    # Ensure the directory exists
-    os.makedirs(f'results/{model_type}', exist_ok=True)
+        plot_feature_importance(model, features, f'{output_dir}/feature_importance_{spot}.png')
 
     # Save the model
-    save_model(model, f'results/{model_type}/surf_prediction_model_{spot}.joblib')
+    save_model(model, f'{output_dir}/surf_prediction_model_{spot}.joblib')
 
 if __name__ == "__main__":
     main()

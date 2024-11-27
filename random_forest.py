@@ -56,6 +56,7 @@ class DecisionTree:
             return tree
         if x[tree['feature']] <= tree['threshold']:
             return self._predict_single(x, tree['left'])
+
         return self._predict_single(x, tree['right'])
 
     def predict(self, X):
@@ -80,6 +81,7 @@ class RandomForestClassifier:
         
         np.random.seed(self.random_state)
         self.trees = []
+        
         for _ in range(self.n_estimators):
             tree = DecisionTree(max_depth=self.max_depth)
             X_sample, y_sample = self._bootstrap_sample(X, y)
@@ -87,6 +89,7 @@ class RandomForestClassifier:
             self.trees.append(tree)
         
         self.feature_importances_ = np.zeros(X.shape[1])
+        
         for tree in self.trees:
             self._update_feature_importances(tree.tree, 1.0)
         self.feature_importances_ /= self.n_estimators
@@ -112,15 +115,18 @@ class RandomForestClassifier:
     def predict(self, X):
         X = np.array(X)
         tree_preds = np.array([tree.predict(X) for tree in self.trees])
+
         return np.array([Counter(pred).most_common(1)[0][0] for pred in tree_preds.T])
 
     def predict_proba(self, X):
         X = np.array(X)
         tree_preds = np.array([tree.predict(X) for tree in self.trees])
         probas = []
+
         for pred in tree_preds.T:
             count = Counter(pred)
             total = sum(count.values())
             proba = [count.get(0, 0) / total, count.get(1, 0) / total]
             probas.append(proba)
+
         return np.array(probas)
