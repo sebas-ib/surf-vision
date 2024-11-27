@@ -1,8 +1,9 @@
 import sys
 import os
 import argparse
+
 from data_preprocessing import load_data, preprocess_data, select_features
-from data_utils import encode_target, split_data
+from data_utils import encode_target, split_data, scale_features
 from model_training import train_model
 from model_utils import evaluate_model, plot_feature_importance, save_model
 from config import spot_files, models  # Import the dictionaries
@@ -52,6 +53,10 @@ def main():
 
     # Get the model instance
     model = models[model_type]
+
+    # Scale features only for logistic regression
+    if model_type == 'logistic_regression':
+        X_train, X_test = scale_features(X_train, X_test)
 
     # Train and evaluate model
     model = train_model(model, X_train, y_train)
