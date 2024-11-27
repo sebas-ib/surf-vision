@@ -1,0 +1,6 @@
+,precision,recall,f1-score,support
+Not Worth Surfing,0.86,1.0,0.92,12.0
+Worth Surfing,1.0,0.86,0.92,14.0
+accuracy,0.92,0.92,0.92,0.92
+macro avg,0.93,0.93,0.92,26.0
+weighted avg,0.93,0.92,0.92,26.0
