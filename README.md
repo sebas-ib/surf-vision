@@ -121,6 +121,10 @@ Feature importance plot saved as 'results/random_forest/blacks_beach/feature_imp
 Model saved as 'results/random_forest/blacks_beach/surf_prediction_model_blacks_beach.joblib'
 ```
 
+## Data
+
+The dataset we use is available at: https://www.kaggle.com/datasets/georgewells8/socal-surf-forecast-apr-may-24
+
 ## Dependencies
 
 This project uses the following external libraries:
