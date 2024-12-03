@@ -1,4 +1,3 @@
-
 from logistic_regression import LogisticRegression
 from random_forest import RandomForestClassifier
 
@@ -10,11 +9,12 @@ spot_files = {
     'oceanside_harbour': 'swell-data/Oceanside_Harbor_North_San_Diego_County_swell_data.csv',
     'oceanside_pier': 'swell-data/Oceanside_Pier_North_San_Diego_County_swell_data.csv',
     'san_onofre': 'swell-data/San_Onofre_South_Orange_County_swell_data.csv'
+    # Add more spots here if needed
 }
 
 # Available models
 models = {
     'random_forest': RandomForestClassifier(n_estimators=100, random_state=42),
     'logistic_regression': LogisticRegression(alpha=0.01, num_iters=1000),
-    # Add more models here
+    # Add more models here if needed
 }

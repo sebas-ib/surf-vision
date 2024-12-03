@@ -1,4 +1,3 @@
-import sys
 import os
 import argparse
 
@@ -6,10 +5,10 @@ from data_preprocessing import load_data, preprocess_data, select_features
 from data_utils import encode_target, split_data, scale_features
 from model_training import train_model
 from model_utils import evaluate_model, plot_feature_importance, save_model
-from config import spot_files, models  # Import the dictionaries
+from config import spot_files, models
 
 def main():
-    # Use argparse for command-line arguments
+    # Parse command-line arguments
     parser = argparse.ArgumentParser(
         description='Train and evaluate surf prediction models for different surf spots.'
     )
@@ -47,14 +46,14 @@ def main():
     X, y = select_features(data)
     features = X.columns # save features for plotting
 
-    # Encode target & divide data into test & train sets
+    # Encode target variable and split data
     y = encode_target(y)
     X_train, X_test, y_train, y_test = split_data(X, y)
 
     # Get the model instance
     model = models[model_type]
 
-    # Scale features only for logistic regression
+    # Scale features for logistic regression
     if model_type == 'logistic_regression':
         X_train, X_test = scale_features(X_train, X_test)
 
@@ -67,8 +66,7 @@ def main():
     evaluate_model(model, X_test, y_test, output_dir)
 
     # Plot feature importance if available
-    if hasattr(model, 'feature_importances_'):
-        plot_feature_importance(model, features, f'{output_dir}/feature_importance_{spot}.png')
+    plot_feature_importance(model, features, f'{output_dir}/feature_importance_{spot}.png')
 
     # Save the model
     save_model(model, f'{output_dir}/surf_prediction_model_{spot}.joblib')

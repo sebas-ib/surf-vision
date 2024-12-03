@@ -1,21 +1,35 @@
-
 import numpy as np
 from collections import Counter
 
 class DecisionTree:
+    '''
+    A simple decision tree classifier based on sklearn's DecisionTreeClassifier
+    '''
+
     def __init__(self, max_depth=None):
         self.max_depth = max_depth
         self.tree = None
 
     def _gini(self, y):
+        '''
+        Calculate the Gini Impurity for a list of classes
+        '''
         _, counts = np.unique(y, return_counts=True)
+
         return 1 - np.sum((counts / len(y)) ** 2)
 
     def _split(self, X, y, feature, threshold):
+        '''
+        Split the dataset based on a feature and a threshold
+        '''
         left_mask = X[:, feature] <= threshold
+
         return (X[left_mask], y[left_mask], X[~left_mask], y[~left_mask])
 
     def _best_split(self, X, y):
+        '''
+        Find the best feature and threshold to split on
+        '''
         best_gini = float('inf')
         best_feature, best_threshold = None, None
 
@@ -32,6 +46,9 @@ class DecisionTree:
         return best_feature, best_threshold
 
     def _build_tree(self, X, y, depth=0):
+        '''
+        Recursively build the decision tree
+        '''
         if len(np.unique(y)) == 1 or (self.max_depth and depth == self.max_depth):
             return Counter(y).most_common(1)[0][0]
 
@@ -49,17 +66,27 @@ class DecisionTree:
         }
 
     def fit(self, X, y):
+        '''
+        Build the decision tree using the training data
+        '''
         self.tree = self._build_tree(X, y)
 
     def _predict_single(self, x, tree):
+        '''
+        Predict the class for a single sample
+        '''
         if not isinstance(tree, dict):
             return tree
+
         if x[tree['feature']] <= tree['threshold']:
             return self._predict_single(x, tree['left'])
 
         return self._predict_single(x, tree['right'])
 
     def predict(self, X):
+        '''
+        Predict the classes for a dataset
+        '''
         return np.array([self._predict_single(x, self.tree) for x in X])
 
 class RandomForestClassifier:
@@ -71,11 +98,18 @@ class RandomForestClassifier:
         self.feature_importances_ = None
 
     def _bootstrap_sample(self, X, y):
+        '''
+        Create a bootstrap sample of the data
+        '''
         n_samples = X.shape[0]
         idxs = np.random.choice(n_samples, size=n_samples, replace=True)
+
         return X[idxs], y[idxs]
 
-    def fit(self, X, y):
+    def fit(self, X, y):    
+        '''
+        Train the random forest model by fitting each tree to a bootstrap sample of the data
+        '''
         X = np.array(X)
         y = np.array(y)
         
@@ -95,6 +129,9 @@ class RandomForestClassifier:
         self.feature_importances_ /= self.n_estimators
 
     def _update_feature_importances(self, node, weight):
+        '''
+        Update feature importances recursively
+        '''
         if isinstance(node, dict):
             self.feature_importances_[node['feature']] += weight
             left_size = self._get_node_size(node['left'])
@@ -107,26 +144,36 @@ class RandomForestClassifier:
                 self._update_feature_importances(node['right'], right_weight)
 
     def _get_node_size(self, node):
+        '''
+        Get the size of a node (number of samples)
+        '''
         if isinstance(node, dict):
             return self._get_node_size(node['left']) + self._get_node_size(node['right'])
         else:
             return 1
 
     def predict(self, X):
+        '''
+        Predict the classes using majority voting
+        '''
         X = np.array(X)
         tree_preds = np.array([tree.predict(X) for tree in self.trees])
 
         return np.array([Counter(pred).most_common(1)[0][0] for pred in tree_preds.T])
 
-    def predict_proba(self, X):
+    def predict_prob(self, X):
+        '''
+        Predict class probabilities
+        '''
         X = np.array(X)
+        
         tree_preds = np.array([tree.predict(X) for tree in self.trees])
-        probas = []
+        probs = []
 
         for pred in tree_preds.T:
             count = Counter(pred)
             total = sum(count.values())
-            proba = [count.get(0, 0) / total, count.get(1, 0) / total]
-            probas.append(proba)
+            prob = [count.get(0, 0) / total, count.get(1, 0) / total]
+            probs.append(prob)
 
-        return np.array(probas)
+        return np.array(probs)
