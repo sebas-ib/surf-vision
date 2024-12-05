@@ -66,7 +66,7 @@ To add a model, instantiate it in the `models` dictionary. (Note: a model class 
 
 ### Command Line Argument `--spot`
 
-Surf spot to use to train model on (required).
+Surf spot to use to train model on (default: `all`). `all` will produce a model based on all spots' data combined.
 
 Defined in `config.py`:
 
@@ -82,7 +82,7 @@ spot_files = {
 }
 ```
 
-To add a spot, add the its relative file path to the `spot_files` dictionary. (Note: the csv data file has to be of the same format as the default spots)
+To add a spot, add its relative file path to the `spot_files` dictionary. (Note: The CSV data file has to be of the same format as the default spots)
 
 ### Example Commands
 
