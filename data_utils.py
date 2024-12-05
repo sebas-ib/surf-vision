@@ -2,13 +2,19 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder, StandardScaler
 
-def encode_target(y):
+def encode_non_numeric_features(data):
     '''
-    Encode target variable using sklearn's LabelEncoder
+    Encode non-numeric features using sklearn's LabelEncoder
     '''
-    encoder = LabelEncoder()
-    y_encoded = encoder.fit_transform(y)
-    return y_encoded
+    le = LabelEncoder()
+
+    for column in data.select_dtypes(include=['object']).columns:
+        print(f"Encoding {column}...")
+        data[column] = le.fit_transform(data[column])
+
+    print("Features encoded\n")
+
+    return data
 
 def split_data(X, y, test_size=0.2, random_state=42):
     '''

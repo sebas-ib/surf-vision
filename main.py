@@ -1,8 +1,8 @@
 import os
 import argparse
 
-from data_preprocessing import load_data, preprocess_data, select_features
-from data_utils import encode_target, split_data, scale_features
+from data_preprocessing import load_all_spots_data, load_single_spot_data, preprocess_data, select_features
+from data_utils import encode_non_numeric_features,split_data, scale_features
 from model_training import train_model
 from model_utils import evaluate_model, plot_feature_importance, save_model
 from config import spot_files, models
@@ -23,12 +23,12 @@ def main():
         )
     )
     parser.add_argument(
-        '--spot',
-        type=str,
-        required=True,
-        choices=spot_files.keys(),  # Use keys from the spot_files dictionary
+        '--spot', 
+        type=str, 
+        default="all", 
+        choices=spot_files.keys(),
         help=(
-            'Surf spot to use for data. '
+            'Specify a spot to use. Default is "all", which will use data from all spots. '
             'Available spots: ' + ', '.join(spot_files.keys()) + '.'
         )
     )
@@ -37,17 +37,23 @@ def main():
     model_type = args.model
     spot = args.spot
 
-    # Get data file for the selected spot
-    data_file = spot_files[spot]
-
-    # Load and preprocess data
-    data = load_data(data_file)
+    if spot == "all":
+        # Load and preprocess data from all spots
+        data = load_all_spots_data(spot_files)
+    else:
+        # Load and preprocess data from a single spot
+        data_file = spot_files[spot]
+        data = load_single_spot_data(data_file)
+        
+    # Preprocess and encode data
     data = preprocess_data(data)
-    X, y = select_features(data)
+    data = encode_non_numeric_features(data)
+
+    # Select features
+    X, y = select_features(data, include_surf_break=True if spot == "all" else False) 
     features = X.columns # save features for plotting
 
-    # Encode target variable and split data
-    y = encode_target(y)
+    # Split data
     X_train, X_test, y_train, y_test = split_data(X, y)
 
     # Get the model instance
